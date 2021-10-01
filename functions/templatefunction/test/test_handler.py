@@ -1,0 +1,29 @@
+from cognite.client import CogniteClient
+from cognite.client.data_classes.datapoints import Datapoints
+from cognite.client.testing import monkeypatch_cognite_client
+
+from functions.templatefunction.function.handler import handle
+
+
+def test_handle():
+    with monkeypatch_cognite_client():
+        c = CogniteClient()
+        c.datapoints.retrieve_latest.return_value = Datapoints(value=[5])
+        handle(
+            data={
+                "temperature_ts": "temp_ts",
+                "pressure_ts": "press_ts",
+            },
+            client=c,
+            secrets={},
+        )
+
+        handle(
+            {
+                "temperature_ts": "temp_ts",
+                "pressure_ts": "press_ts",
+                "backfilling": "True",
+            },
+            client=c,
+            secrets={},
+        )
