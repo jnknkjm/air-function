@@ -1,9 +1,8 @@
 Projectproperties:
-  eureka-tad-dev: ["https://api.cognitedata.com", "EUREKA_TAD_DEV_API_KEY"] # you do not need to specify the default api url
-  sebnickelgreenfield: ["https://greenfield.cognitedata.com", "SEBNICKELGREENFIELD_API_KEY"]
+  my-project: ['https://api.cognitedata.com', '!-gh,Q0&@*2PxTV@gA!={e#,;fKO:U']
 ProjectFunctionMap:
-  templatefunction:
-    - eureka-tad-dev
+  my_function:
+    - air-function
 ## if you want to add a second project you can also do the following way:
 ## make sure you add the APIKEY to Github secrets and add it to the 3 workflow files in .github/workflows
 # your_other_project: ["https://api.cognitedata.com", "APIKEY"]
