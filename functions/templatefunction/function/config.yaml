@@ -1,26 +1,35 @@
 schedule:
-  runEveryHour: 1 # How often every schedule will run according to the time
+  cronExpression: 0 0 1 * *
+
 modelDescription:
-  frontEndName: "Enter front end name for model" # This is how the end user will see it
-  description: "Enter description of model" # ignore this
-  longDescription: "Enter long description of model" # This description will be displayed in the Front End
+  frontEndName: "PCA model"
+  description: "When PC1 has outliner, an alert is created."
+
 modelSettings:
-  modelVersion: "0.0.0" # MAJOR.MINOR.BUGFIX: when increasing MAJOR or MINOR a new backfilling is triggered
+  modelVersion: "1.0.0" # set the version of your model here
   sendAlerts: True  # set to True if you want the events of this model being propagated to the front end
   displayInFrontEnd: True # set to True if it should be selectable in the front end
-  backfill: False # set to True when you want to backfill, checkout the documention
+  backfill: True
 
-fields: # example fields defined below. These will be displayed for the SME
-  temperature_ts: # id is important for how to access the data in the handler.py and visualization
-    name: "Temperature" # Displayed to the SME
-    description: "Please provide a Time Series that measures temperature." # Displayed to the SME
-    type: TimeSeries # possible types: TimeSeries, str, float, bool
-    multiple: False # only for Time Series: True will allow you to input multiple Time Series in this field
-  pressure_ts:
-    name: "Pressure"
-    description: "Please provide a Time Series that measures pressure."
-    type: TimeSeries
-    multiple: False
+fields:
+  sensor_11:
+    name: "sensor_11"
+    description: "A time series that is going to be monitored"
+    type: "TimeSeries"
+  pc1:
+    name: "pc1"
+    description: "When the selected time series crosses above on this threshold an alert will be created."
+    type: "TimeSeries"
+  anomaly_pc1:
+    name: "anomaly_pc1"
+    description: "When pc1 indicate anomaly, set anomaly flag."
+    type: "TimeSeries"
+  machine_status:
+    name: "machine_status"
+    description: "Actual machine status."
+    type: "TimeSeries"
+
 visualization:
   timeSeries:
-    fields: ["temperature_ts", "pressure_ts"] # ids refer to the ids in the fields, now these two Time Series would be displayed
+    fields: ["sensor_11", "anomaly_pc1", "machine_status"]
+  grouping: [["sensor_11", "anomaly_pc1", "machine_status"]]

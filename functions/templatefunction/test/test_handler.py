@@ -11,8 +11,8 @@ def test_handle():
         c.datapoints.retrieve_latest.return_value = Datapoints(value=[5])
         handle(
             data={
-                "temperature_ts": "temp_ts",
-                "pressure_ts": "press_ts",
+                "sensor_11": "sensor_11",
+                "anomaly_pc1": "anomaly_pc1"
             },
             client=c,
             secrets={},
@@ -20,8 +20,8 @@ def test_handle():
 
         handle(
             {
-                "temperature_ts": "temp_ts",
-                "pressure_ts": "press_ts",
+                "sensor_11": "sensor_11",
+                "anomaly_pc1": "anomaly_pc1",
                 "backfilling": "True",
             },
             client=c,
