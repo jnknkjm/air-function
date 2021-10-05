@@ -3,7 +3,7 @@ Projectproperties:
     base_url: "https://greenfield.cognitedata.com"
     tenant_id: "c2bafc3c-94d1-4831-b4f7-8b568780910a"
     client_id: "d1b36d6b-335b-4ecf-849f-a0e218f5bf22"
-    secret_name: "NAKAJIMA_DEMO_SECRET"
+    secret_name: "Zf~oGT-Rx59z_6692C~unsPL4_uwqm~UXD"
     token_url: "https://login.microsoftonline.com/c2bafc3c-94d1-4831-b4f7-8b568780910a/oauth2/v2.0/token"
     scopes: ["https://greenfield.cognitedata.com/.default"]
 
