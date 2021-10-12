@@ -11,7 +11,7 @@ Projectproperties:
   dea-dev: ["https://api.cognitedata.com", "DEA_DEV_API_KEY"]
   officerobotics: ["https://greenfield.cognitedata.com", "OFFICEROBOTICS_API_KEY"]
   servi-dev: [ "https://api.cognitedata.com", "SERVI_DEV_API_KEY" ]
-  jp-demo: [ "https://api.cognitedata.com", "ZWU3MTFjNGItNTVkZC00ODIxLWE1ZjEtMjY3NzlhNzcxMjY0" ]
+  jp-demo: [ "https://api.cognitedata.com", "JP_DEMO_API_KEY" ]
   jp-dev: ["https://asia-northeast1-1.cognitedata.com", "JP_DEV_API_KEY"]
   akerbm-dev: ["https://api.cognitedata.com", "AKER_BM_DEV_API_KEY"]
   kvaerner : ["https://api.cognitedata.com", "KVAERNER_API_KEY"]
