@@ -1,0 +1,36 @@
+schedule:
+  runEveryMinute: 1
+
+modelDescription:
+  frontEndName: "Upper Threshold ver."
+  description: "When a selected time series exceeds this value, an alert is created."
+  longDescription: "When a selected time series exceeds this value, an alert is created.
+  Alerts that are not older than two hours are merged to prevent spamming."
+
+
+modelSettings:
+  modelVersion: "0.5.0" # set the version of your model here
+  sendAlerts: True  # set to True if you want the events of this model being propagated to the front end
+  displayInFrontEnd: True # set to True if it should be selectable in the front end
+  backfill: True
+loadBalancer: True
+
+fields:
+  ts_ext_id:
+    name: "Time series"
+    description: "A time series that is going to be monitored"
+    type: "TimeSeries"
+  threshold:
+    name: "Upper Threshold"
+    description: "When the selected time series exceeds this threshold an alert will be created."
+    type: "float"
+  min_minutes:
+    name: "Minimum Length in Minutes"
+    description: "Please define how long the threshold needs to be exceeded before it is registered as an alert. (Note: a smaller amount might lead to more notifications but you can edit this value later on.)"
+    type: "float"
+
+visualization:
+  timeSeries:
+    fields: ["ts_ext_id"]
+  thresholds:
+    fields: ["threshold"]
