@@ -1,42 +1,48 @@
-import constants
 from cognite.air import AIRClient
 from cognite.air.alert_utils import AlertCreator
 from cognite.air.ts_utils import current_time_in_ms
 from cognite.air.utils import is_string_truthy
-from helpers import run
+from cognite.client import CogniteClient
+from cognite.client.data_classes import TimeSeries
+from cognite.client.utils import ms_to_datetime
 
-OVERLAP = int(12 * 3600 * 1e3)
+ALERT_WINDOW = int(12 * 3600 * 1e3)
+WINDOW_SIZE_MS = int(12 * 3600 * 1e3)
+BACKFILLING_WINDOW_SIZE = int(3 * 24 * 3600 * 1e3)
+MERGE_PERIOD_IN_MS = int(10 * 60 * 1e3)
+BACKFILLING_OFFSET = int(60 * 60 * 1e3)
+MIN_SIZE_OF_OUTAGE = int(10 * 60 * 1e3)
+MAX_LENGTH_OF_ALERT = int(12 * 3600 * 1e3)
+BACKFILL_RUNS = 1500
+MAX_EVENTS_TO_BE_PROCESSED = 1000
 
 
-def handle(data, client, secrets):
-    print(data)  # helpful for debugging
+def handle(data, client: CogniteClient, secrets):
     air_client = AIRClient(data, client, secrets, debug=True)
-    # retrieve fields from front end
-    time_series = air_client.retrieve_field("time_series")
+    print(data["schedule_asset_ext_id"])
+    integration = is_string_truthy(data.get("integretation"))
+    time_series: TimeSeries = air_client.retrieve_field("ts_ext_id")
+    if time_series.is_string:
+        return
     if time_series.first() is None:
-        print(f"Time Series {time_series.external_id} has no data points.")
+        print(f"Time Series {time_series.external_id} has no data")
+        if air_client.backfilling.in_progress:
+            air_client.backfilling.mark_as_completed()
         return ()
-    std_sensitivity, time_frame_RA = air_client.retrieve_fields(["sensitivity", "time_frame"])
-    long_term_interval, short_term_interval, std_threshold = retrieve_std_interval(time_frame_RA, std_sensitivity)
+    threshold: float = air_client.retrieve_field("threshold")
+    min_length_of_alert: int = int(air_client.retrieve_field("min_minutes") * 60 * 1e3)
 
-    end: int = current_time_in_ms()  # now
-    ac = AlertCreator(
-        air_client,
-        constants.MERGE_PERIOD_IN_MS,
-        constants.MIN_LENGTH_OF_ALERTS,
-        constants.MAX_LENGTH_OF_ALERTS,
-        constants.ALERT_WINDOW,
-    )
-
+    ac = AlertCreator(air_client, MERGE_PERIOD_IN_MS, min_length_of_alert, MAX_LENGTH_OF_ALERT, ALERT_WINDOW)
     if air_client.backfilling.in_progress:
         if not is_string_truthy(data.get("backfilling")):
             print("Call from schedule but should be backfilled first")
             return ()
+        # if backfilling is in progress either take latest_backfilling_timestamp or first events created time + 1min
         first_timestamp = time_series.first().timestamp  # type: ignore
         end = air_client.backfilling.latest_timestamp or first_timestamp
-        end += constants.BACKFILLING_WINDOW_SIZE
-        for i in range(constants.BACKFILL_RUNS):
-            if end - constants.BACKFILLING_WINDOW_SIZE > current_time_in_ms():
+        end += BACKFILLING_WINDOW_SIZE
+        for i in range(BACKFILL_RUNS):
+            if end - BACKFILLING_WINDOW_SIZE > current_time_in_ms():
                 air_client.backfilling.mark_as_completed()
                 break
             end = run(
@@ -44,63 +50,58 @@ def handle(data, client, secrets):
                 ac,
                 time_series,
                 end,
-                constants.BACKFILLING_WINDOW_SIZE,
-                long_term_interval,
-                short_term_interval,
-                std_threshold,
+                BACKFILLING_WINDOW_SIZE,
+                threshold,
+                integration,
             )
             air_client.backfilling.update_latest_timestamp(end)
-            end += constants.BACKFILLING_WINDOW_SIZE
+            end += BACKFILLING_WINDOW_SIZE
     else:
+        end = current_time_in_ms()
         run(
             client,
             ac,
             time_series,
             end,
-            constants.WINDOW_SIZE_MS,
-            long_term_interval,
-            short_term_interval,
-            std_threshold,
+            WINDOW_SIZE_MS,
+            threshold,
+            integration,
         )
 
 
-def retrieve_std_interval(time_frame_RA, std_sensitivity):
+def run(
+    client: CogniteClient,
+    alert_creator: AlertCreator,
+    time_series: TimeSeries,
+    end: int,
+    window_size: int,
+    threshold: float,
+    integration: bool = False,
+) -> int:
+    dp = (
+        client.datapoints.retrieve(
+            id=time_series.id,
+            start=end - window_size - BACKFILLING_OFFSET,
+            end=end,
+            aggregates=["max"],
+            granularity="1m",
+        )
+        .to_pandas()
+        .dropna()
+    )
+    print(f"covered period from {ms_to_datetime(end-window_size)} until {ms_to_datetime(end)}")
+    print(f"length of data {0 if dp is None else len(dp)}")
+    if dp.shape[0] == 0:
+        return end
 
-    # fixing potential spelling errors - we will remove this after dropdown menu is added to AIR
-    if time_frame_RA.strip() in ("VS", "vs", "Vs", "vS"):
-        time_frame_RA = "VS"
-    elif time_frame_RA.strip() in ("S", "s"):
-        time_frame_RA = "S"
-    elif time_frame_RA.strip() in ("M", "m"):
-        time_frame_RA = "M"
-    else:
-        time_frame_RA = "L"
+    notification_message = f"A threshold on the time series {time_series.name} has been breached (X > {threshold})."
+    dp.columns = ["value"]
+    dp["deviation"] = dp["value"] > threshold
 
-    if std_sensitivity.strip() in ("H", "h"):
-        std_sensitivity = "H"
-    elif std_sensitivity.strip() in ("M", "m"):
-        std_sensitivity = "M"
-    else:
-        std_sensitivity = "L"
-
-    # assign values based on front end selections:
-    if time_frame_RA == constants.INTERVAL_NAMES[0]:  # very short term
-        long_term_interval = constants.LONG_TERM_INTERVAL[0]
-        short_term_interval = constants.SHORT_TERM_INTERVAL[0]
-    elif time_frame_RA == constants.INTERVAL_NAMES[1]:  # short term
-        long_term_interval = constants.LONG_TERM_INTERVAL[1]
-        short_term_interval = constants.SHORT_TERM_INTERVAL[1]
-    elif time_frame_RA == constants.INTERVAL_NAMES[2]:  # medium term
-        long_term_interval = constants.LONG_TERM_INTERVAL[2]
-        short_term_interval = constants.SHORT_TERM_INTERVAL[2]
-    else:  # long term
-        long_term_interval = constants.LONG_TERM_INTERVAL[3]
-        short_term_interval = constants.SHORT_TERM_INTERVAL[3]
-
-    if std_sensitivity == constants.THRESHOLD_NAMES[0]:  # low
-        std_threshold = constants.STD_THRESHOLDS[0]
-    elif std_sensitivity == constants.THRESHOLD_NAMES[1]:  # medium
-        std_threshold = constants.STD_THRESHOLDS[1]
-    else:  # high
-        std_threshold = constants.STD_THRESHOLDS[2]
-    return long_term_interval, short_term_interval, std_threshold
+    _, _, endpoint = alert_creator.create_alerts(
+        dp[["deviation"]],
+        end,
+        notification_message,
+        MAX_EVENTS_TO_BE_PROCESSED,
+    )
+    return endpoint

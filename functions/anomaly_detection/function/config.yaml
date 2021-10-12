@@ -1,35 +1,36 @@
 schedule:
-  cronExpression: 0 0 1 * *
+  runEveryMinute: 1
 
 modelDescription:
-  frontEndName: "PCA model"
-  description: "When PC1 has outliner, an alert is created."
+  frontEndName: "Upper Threshold ver."
+  description: "When a selected time series exceeds this value, an alert is created."
+  longDescription: "When a selected time series exceeds this value, an alert is created.
+  Alerts that are not older than two hours are merged to prevent spamming."
+
 
 modelSettings:
-  modelVersion: "1.0.0" # set the version of your model here
+  modelVersion: "0.5.0" # set the version of your model here
   sendAlerts: True  # set to True if you want the events of this model being propagated to the front end
   displayInFrontEnd: True # set to True if it should be selectable in the front end
   backfill: True
+loadBalancer: True
 
 fields:
-  sensor_11:
-    name: "sensor_11"
+  ts_ext_id:
+    name: "Time series"
     description: "A time series that is going to be monitored"
     type: "TimeSeries"
-  pc1:
-    name: "pc1"
-    description: "When the selected time series crosses above on this threshold an alert will be created."
-    type: "TimeSeries"
-  anomaly_pc1:
-    name: "anomaly_pc1"
-    description: "When pc1 indicate anomaly, set anomaly flag."
-    type: "TimeSeries"
-  machine_status:
-    name: "machine_status"
-    description: "Actual machine status."
-    type: "TimeSeries"
+  threshold:
+    name: "Upper Threshold"
+    description: "When the selected time series exceeds this threshold an alert will be created."
+    type: "float"
+  min_minutes:
+    name: "Minimum Length in Minutes"
+    description: "Please define how long the threshold needs to be exceeded before it is registered as an alert. (Note: a smaller amount might lead to more notifications but you can edit this value later on.)"
+    type: "float"
 
 visualization:
   timeSeries:
-    fields: ["sensor_11", "anomaly_pc1", "machine_status"]
-  grouping: [["sensor_11", "anomaly_pc1", "machine_status"]]
+    fields: ["ts_ext_id"]
+  thresholds:
+    fields: ["threshold"]

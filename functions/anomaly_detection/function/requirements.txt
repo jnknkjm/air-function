@@ -1,6 +1,5 @@
 cognite-air-sdk>=3.0.0
 poetry
-msal
 numpy
 pandas
 warnings
