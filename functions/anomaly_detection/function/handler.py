@@ -89,8 +89,8 @@ def run(
         .to_pandas()
         .dropna()
     )
-    #print(f"covered period from {ms_to_datetime(end-window_size)} until {ms_to_datetime(end)}")
-    #print(f"length of data {0 if dp is None else len(dp)}")
+    print(f"covered period from {ms_to_datetime(end-window_size)} until {ms_to_datetime(end)}")
+    print(f"length of data {0 if dp is None else len(dp)}")
     if dp.shape[0] == 0:
         return end
 

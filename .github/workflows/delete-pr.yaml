@@ -11,7 +11,7 @@ env:
   GITHUB_REPOSITORY_TOKEN: ${{ github.repository }}
   IS_DELETE: true
   MULTI_DEPLOYMENT: 'true'
-  JP_DEMO_API_KEY: "ZWU3MTFjNGItNTVkZC00ODIxLWE1ZjEtMjY3NzlhNzcxMjY0"
+  JP_DEMO_API_KEY: "M2Y5NzI4MjgtOTAyMS00ZDVmLWEwOGQtOWU4NTNmMjQxZmRk"
 # if you want to deploy to more projects add the API key here
 jobs:
   cfm:
