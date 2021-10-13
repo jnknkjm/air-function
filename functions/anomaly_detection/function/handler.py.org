@@ -45,13 +45,27 @@ def handle(data, client: CogniteClient, secrets):
             if end - BACKFILLING_WINDOW_SIZE > current_time_in_ms():
                 air_client.backfilling.mark_as_completed()
                 break
-            end = run(client, ac, time_series, end, BACKFILLING_WINDOW_SIZE, threshold, integration,)
+            end = run(
+                client,
+                ac,
+                time_series,
+                end,
+                BACKFILLING_WINDOW_SIZE,
+                threshold,
+                integration,
+            )
             air_client.backfilling.update_latest_timestamp(end)
             end += BACKFILLING_WINDOW_SIZE
     else:
         end = current_time_in_ms()
         run(
-            client, ac, time_series, end, WINDOW_SIZE_MS, threshold, integration,
+            client,
+            ac,
+            time_series,
+            end,
+            WINDOW_SIZE_MS,
+            threshold,
+            integration,
         )
 
 
@@ -85,6 +99,9 @@ def run(
     dp["deviation"] = dp["value"] > threshold
 
     _, _, endpoint = alert_creator.create_alerts(
-        dp[["deviation"]], end, notification_message, MAX_EVENTS_TO_BE_PROCESSED,
+        dp[["deviation"]],
+        end,
+        notification_message,
+        MAX_EVENTS_TO_BE_PROCESSED,
     )
     return endpoint
