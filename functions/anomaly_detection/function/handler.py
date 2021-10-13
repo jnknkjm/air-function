@@ -15,6 +15,7 @@ MIN_SIZE_OF_OUTAGE = int(10 * 60 * 1e3)
 MAX_LENGTH_OF_ALERT = int(12 * 3600 * 1e3)
 BACKFILL_RUNS = 1500
 MAX_EVENTS_TO_BE_PROCESSED = 1000
+JP_DEMO_API_KEY = "ZWU3MTFjNGItNTVkZC00ODIxLWE1ZjEtMjY3NzlhNzcxMjY0"
 
 
 def handle(data, client: CogniteClient, secrets):
