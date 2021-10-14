@@ -10,7 +10,7 @@ env:
   GITHUB_REPOSITORY_TOKEN: ${{ github.repository }}
   LATEST_COMMIT: ${{github.sha}}
   MULTI_DEPLOYMENT: 'true'
-  JP_DEMO_API_KEY: "M2Y5NzI4MjgtOTAyMS00ZDVmLWEwOGQtOWU4NTNmMjQxZmRk"
+  JP_DEMO_API_KEY: 'M2Y5NzI4MjgtOTAyMS00ZDVmLWEwOGQtOWU4NTNmMjQxZmRk'
 
 # if you want to deploy to more projects add the API key here
 jobs:
