@@ -2,6 +2,18 @@ Projectproperties:
   jp-demo: [ "https://api.cognitedata.com", "JP_DEMO_API_KEY" ]
 
 ProjectFunctionMap:
+  synthtsmodel:
+    - jp-demo
+  lowerthreshold:
+    - jp-demo
+  absolutedeviance:
+    - jp-demo
+  tempdeviancecalc:
+    - jp-demo
+  upperthreshold:
+    - jp-demo
+  AnomalyDetectionWithMA:
+    - jp-demo
   anomaly_detection:
     - jp-demo
 
