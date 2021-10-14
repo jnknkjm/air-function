@@ -2,7 +2,7 @@ name: 'Functions build: PR closed'
 
 on:
   pull_request:
-    types: closed
+    types: [closed]
     paths:
       - '**'
 env:
