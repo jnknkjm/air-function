@@ -6,5 +6,5 @@ warnings
 matplotlib
 sklearn
 statsmodels
-cognite-sdk>=2.28.2
+cognite-sdk
 black

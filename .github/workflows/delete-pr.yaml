@@ -11,7 +11,8 @@ env:
   IS_DELETE: true
   MULTI_DEPLOYMENT: 'true'
   JP_DEMO_API_KEY: 'M2Y5NzI4MjgtOTAyMS00ZDVmLWEwOGQtOWU4NTNmMjQxZmRk'
-  COGNITE_DISABLE_PYPI_VERSION_CHECK: 0
+  #COGNITE_DISABLE_PYPI_VERSION_CHECK: 0
+
 # if you want to deploy to more projects add the API key here
 jobs:
   cfm:
