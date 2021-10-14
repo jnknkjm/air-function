@@ -7,3 +7,4 @@ matplotlib
 sklearn
 statsmodels
 cognite-sdk
+black>=19.10b0
